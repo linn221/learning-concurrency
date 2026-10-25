@@ -1,0 +1,1 @@
+to synchronize access to a resource, by locking.
