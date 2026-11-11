@@ -4,6 +4,7 @@ Repo for learning concurrency in golang
 - [Youtube](https://www.youtube.com/watch?v=zJd7Dvg3XCk)
 (a great course for learning Golang in general)
 - [Go.dev](https://go.dev/tour/concurrency/1)
+- [Google](https://www.youtube.com/watch?v=f6kdp27TYZs)
 
 ### Progress/Goal
 want to learn these concepts:

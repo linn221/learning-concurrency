@@ -4,7 +4,6 @@ A primary way of passing data between go routines.
 They are preferred over using [mutex](mutex.md) in
 > Don't communicate by sharing memory. **Share memory by communicating** *
 
-which essentially mean communication as a means to an end, which is sharing memory, not the other way around.
 The former share a resource between many goroutines, while the latter pass ownership of the resource between goroutines, allowing each goroutine to work on it exclusively at a given time.
 
 ChatGPT says:
@@ -14,10 +13,13 @@ instead of 2 go routines communicating by sharing a resource (ie, counter variab
 using channels make the role explicit, writing end or receiving end. it makes the code easier to reason. shared memory vs ownership
 
 
+
+
+
 ### Syntax
 memorization of channel syntax is required first.
 
-```golang
+```go
 ch := make(chan int) // creating a channel
 
 go func() {
@@ -116,4 +118,4 @@ b := <-ch
 ```
 when a channel is buffered, you can write to the channel without being blocked (waiting until the channel is read in order to write a second time) until the buffer is full.
 
-it is [Deadlock](Deadlock.md) to write to a channel more than the buffer length with no receiving end
+it is [deadlock](deadlock.md) to write to a channel more than the buffer length with no receiving end

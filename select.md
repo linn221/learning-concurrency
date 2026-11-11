@@ -4,6 +4,12 @@ The `default` case in a `select` is run if no other case is ready.
 
 - listens on more than one channel at a time.
 - whatever channel return first on the case statement will be read.
+
+
+> [!NOTE]
+> `select` blocks listening until the selected case is done.
+> when listening on 3 channels, and a default case, the default case is selected, if the default case sleep for 10 seconds, the channels are not read until that 10 seconds pass. after that, it will select the very first case.
+
 ### Example
 ```go
 func fibonacci(c, quit chan int) {

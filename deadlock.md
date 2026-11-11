@@ -14,3 +14,4 @@ egs:
 	  }()
 ```
 - locking a mutex twice
+- writing to a channel x number of times but indefinitely reading from it is also a deadlock (from the main func anyways)
