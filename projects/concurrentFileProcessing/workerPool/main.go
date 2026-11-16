@@ -105,7 +105,7 @@ func main() {
 	}
 
 	start := time.Now()
-	_ = SearchDir(os.Args[1])
+	results := SearchDir(os.Args[1])
 	t := time.Since(start).Round(time.Millisecond) //not counting the printing time
 	// for hash, fileList := range results {
 	// if len(fileList) > 1 {
@@ -117,4 +117,5 @@ func main() {
 	// }
 	// }
 	fmt.Println(t)
+	fmt.Println(len(results))
 }

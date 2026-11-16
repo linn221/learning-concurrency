@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	totalFiles          = 500_000
-	duplicatePercentage = 70
-	maxDuplicateFiles   = 15
-	maxContentSize      = 5000
+	totalFiles          = 100_000
+	duplicatePercentage = 20
+	maxDuplicateFiles   = 8
+	maxContentSize      = 50000
 )
 
 // run => go run . ../dumps
