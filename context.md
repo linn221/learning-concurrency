@@ -43,3 +43,5 @@ func expensiveCalculation(ctx context.Context, input string) (string, error) {
 > [!NOTE]
 > pass ctx as function argument and watch for `ctx.Err()` every once in a while, for doing time consuming work, to exit the execution, saving un-needed work
 > for http requests, always pass the ctx, then, once the user concel the request, the third party API call get cancelled since we have passed the ctx.
+
+- we can use a buffered channel to implement a [countingSemiphore](countingSemiphore.md), which limits the number of active go routine

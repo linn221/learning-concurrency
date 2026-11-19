@@ -38,3 +38,7 @@ when the function is runned via a go routine multiple times via a for loop, it b
 instead of spawing a goroutine for every job, we divide the job into a limited number of goroutine(worker) and let them have it.
 
 *each worker must know when to exit, after the read channel is closed. it is conventional to use a for range for reading from the channel*
+
+### closing a channel
+Closing a channel is typically done in main func, can't let workers close.
+it could be achived by using a done singal channel (chan struct{}), and reading from it for the number of workers, or a [[waitGroup]].
