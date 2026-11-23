@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -41,7 +42,6 @@ func HashFile(path string) *pair {
 
 // worker
 func processFile(path string, wg *sync.WaitGroup, ioLimit chan struct{}, pairsCh chan<- pair) {
-	wg.Add(1)
 	defer wg.Done()
 	ioLimit <- struct{}{}
 	defer func() {
@@ -56,12 +56,12 @@ func processFile(path string, wg *sync.WaitGroup, ioLimit chan struct{}, pairsCh
 // on a sub directory, use another go routine to walk that sub directory
 // use ioLimit as counting semaphore for limiting max io operations at a time
 func walkDir(baseDir string, wg *sync.WaitGroup, ioLimit chan struct{}, pairsCh chan<- pair) {
+	defer wg.Done()
+
 	ioLimit <- struct{}{}
 	defer func() {
 		<-ioLimit
 	}()
-
-	defer wg.Done()
 
 	filepath.Walk(baseDir, func(path string, info fs.FileInfo, err error) error {
 		if info.IsDir() {
@@ -72,6 +72,7 @@ func walkDir(baseDir string, wg *sync.WaitGroup, ioLimit chan struct{}, pairsCh 
 			}
 		}
 		if info.Mode().IsRegular() && info.Size() > 0 {
+			wg.Add(1)
 			go processFile(path, wg, ioLimit, pairsCh)
 		}
 		return nil
@@ -93,25 +94,30 @@ func main() {
 	// closing the pairsCh is when the waitGroup has finished
 
 	var wg sync.WaitGroup
-	ioLimit := make(chan struct{}, 5000) // limit maxium 100 i/o operation at a time
-	pairsCh := make(chan pair)
+	numsWorkers := runtime.GOMAXPROCS(0) * 890
+	fmt.Println(numsWorkers)
+	ioLimit := make(chan struct{}, numsWorkers) // limit maxium 100 i/o operation at a time
+	pairsCh := make(chan pair, numsWorkers)
 	wg.Add(1)
 	go walkDir(baseDir, &wg, ioLimit, pairsCh)
 
 	// for closing the pairs channel after waitgroup is done
+	resultsCh := make(chan Results)
 	go func() {
-		wg.Wait()
-		close(pairsCh)
+		results := make(Results)
+		for pair := range pairsCh {
+			results[pair.hash] = append(results[pair.hash], pair.path)
+		}
+		resultsCh <- results
 	}()
 
+	wg.Wait()
+	close(pairsCh)
 	// no longer using a channel for results
 	// since this is the end of pipeline
-	results := make(Results)
-	for pair := range pairsCh {
-		results[pair.hash] = append(results[pair.hash], pair.path)
-	}
 	// once pairsCh is close, we assume the work is done
 	t := time.Since(start).Round(time.Millisecond) //not counting the printing time
 	fmt.Println(t)
+	results := <-resultsCh
 	fmt.Println(len(results))
 }
